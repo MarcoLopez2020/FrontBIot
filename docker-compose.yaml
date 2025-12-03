@@ -1,0 +1,91 @@
+version: '3.8'
+
+networks:
+  edge-net:
+    driver: bridge
+
+services:
+  edge-node1:
+    image: 0xpolygon/polygon-edge:latest
+    container_name: edge-node1
+    restart: on-failure
+    ports:
+      - "8545:8545" # JSON-RPC expuesto al host
+      - "9632:9632" # GRPC
+      - "1478:1478" # LibP2P
+    volumes:
+      - ./:/data
+    networks:
+      - edge-net
+    command: >
+      server
+      --data-dir /data/node1
+      --chain /data/genesis.json
+      --grpc-address "0.0.0.0:9632"
+      --libp2p "0.0.0.0:1478"
+      --jsonrpc "0.0.0.0:8545"
+      --seal
+
+  edge-node2:
+    image: 0xpolygon/polygon-edge:latest
+    container_name: edge-node2
+    restart: on-failure
+    ports:
+      - "8546:8545" # JSON-RPC mapeado al 8546 de tu PC
+    volumes:
+      - ./:/data
+    networks:
+      - edge-net
+    depends_on:
+      - edge-node1
+    # Nota: Internamente usan los puertos estándar, Docker aísla las IPs
+    command: >
+      server
+      --data-dir /data/node2
+      --chain /data/genesis.json
+      --grpc-address "0.0.0.0:9632"
+      --libp2p "0.0.0.0:1478"
+      --jsonrpc "0.0.0.0:8545"
+      --seal
+
+  edge-node3:
+    image: 0xpolygon/polygon-edge:latest
+    container_name: edge-node3
+    restart: on-failure
+    ports:
+      - "8547:8545" # JSON-RPC mapeado al 8547 de tu PC
+    volumes:
+      - ./:/data
+    networks:
+      - edge-net
+    depends_on:
+      - edge-node1
+    command: >
+      server
+      --data-dir /data/node3
+      --chain /data/genesis.json
+      --grpc-address "0.0.0.0:9632"
+      --libp2p "0.0.0.0:1478"
+      --jsonrpc "0.0.0.0:8545"
+      --seal
+
+  edge-node4:
+    image: 0xpolygon/polygon-edge:latest
+    container_name: edge-node4
+    restart: on-failure
+    ports:
+      - "8548:8545" # JSON-RPC mapeado al 8548 de tu PC
+    volumes:
+      - ./:/data
+    networks:
+      - edge-net
+    depends_on:
+      - edge-node1
+    command: >
+      server
+      --data-dir /data/node4
+      --chain /data/genesis.json
+      --grpc-address "0.0.0.0:9632"
+      --libp2p "0.0.0.0:1478"
+      --jsonrpc "0.0.0.0:8545"
+      --seal
